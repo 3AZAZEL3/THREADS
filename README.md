@@ -11,4 +11,4 @@ Driver has an information, which locating on DataBase. If need to get info, we c
 Because som drivers locating so far from current locating user, information transfer takes a lot of time. And if driver did not have time to finish the operation, i user Threads to to give an opportunity to finish work. If some threads are alive? more than 5 minutes, the thread must to die. Threads put in hash, whose keys are time in class Time and type int. Values are entity of Threads. 
 
 Code for driver is locating in read_ftp_task.rb
-Structure of instruction discribed by module ServiceHistory
+Structure of instruction discribed by module ServiceFtp
