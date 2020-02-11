@@ -1,14 +1,19 @@
 # THREADS
-Project for using FTP Storage as storage for drivers data
+Проект для создания инструмента по складированию информации с сервера в FTP хранилище с помощью драйвера.
 
+Проект создан и релизован Ореховым А.С. в приод работы в АО НИИАС. Проект реализован на языке JRuby в программной среде клиент-серверной системы Vector-M. Здесь представлен принцип работы драйвера данных, реализованного с помощью многопоточной обработки данных.
 
-This project was whritten by Orekhov A.S. while working in AO NIIAS. At work I used JRuby program language. It was only example of code, nothing bigger. 
+Для начала следует рассказать о мотивации к решению проблемы.
 
-At introduction i want to tell about I would to talk about the motivation for the decision task.
+По каналу данных в буферное хранилище с помощью драйвера записыаются различные данные, которые приходят с внешних систем. Иногда требуется иметь доступ к исторической информации каналов в базе данных, но при этом довольно проблематично брать эту информацию из базы данных. Была предложена система складирования иформации в FTP хранилище в виде csv фвйлов. Чтобы передавать эту информацию по запросу пользователя (предполагается что информацию брать напрямую нет возможности), предлагается драйверу задавать запрос на информацию в виде файла инструкции, где передается кофигурация драйвера, к которому производится запрос и метод для исполнения. Инструкцию предлагается хранить с помощью определенного интерфейса на FTP хранилище. 
 
-Driver has an information, which locating on DataBase. If need to get info, we coild to ask by DataBase, but it so hard to do it many times in a row. So was creating idea to say driver write info to FTP Storage, which it has posibility to connect. Each time driver listeting FTP Storage to find some instructions to do, for example to put information in FTP Storage, for example and do it!
+Принцип работы:
+1. Драйвер обращается в FTP  хранилище и просматривает определенную директорию на предмет наличия зарпоса; 
+2. Если в файле совпала конфигурация драйвера, то исполняется код, который прописан в файле;
+3. После исполнения инструкции, файл с инструкцией удаляется;
+4. Данные в буферном хранилище формируются в виде файлов формата .csv и сохраняются на ftp.
 
-Because som drivers locating so far from current locating user, information transfer takes a lot of time. And if driver did not have time to finish the operation, i user Threads to to give an opportunity to finish work. If some threads are alive? more than 5 minutes, the thread must to die. Threads put in hash, whose keys are time in class Time and type int. Values are entity of Threads. 
+Предполагается что драйверов несколько и что инструкций было послано несколько. Для того,чтобы обработать все запросы, предлагается под каждую инструкцию создать определенный поток данных, чтобы залипании потока на одном процессе, другие процессы не пострадали. Если процесс длиться дольше 5 минут, то поток убивается. Все потоки сохраняются в глбальный хеш данных, глде ключом является время создания, а значением - сущность потока. Для очищения хеша предлагается удалять все записи о потоках старше 5 минут.
 
-Code for driver is locating in read_ftp_task.rb
-Structure of instruction discribed by module ServiceFtp
+В файле read_ftp_task.rb описан код просмотра FTP хранилища на наличие инструкций и исполнения кода, а также код обработки потоков.
+В файле ServiceFtp.rb описан метод для создания файлов инструкций.
